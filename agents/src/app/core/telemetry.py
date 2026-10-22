@@ -23,7 +23,7 @@ def configure_telemetry(app: FastAPI, settings: Settings) -> None:
     )
     logfire.instrument_pydantic_ai(
         include_content=settings.logfire_include_content,
-        include_binary_content=False,
+        include_binary_content=True,
     )
     logfire.instrument_httpx()
     logfire.instrument_fastapi(

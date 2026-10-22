@@ -4,7 +4,6 @@ import { conversations, threads } from "./db/schema.ts";
 
 const nonEmpty = (schema: z.ZodString) => schema.min(1);
 
-// z.json() is recursive; registering it gives its self-references an OpenAPI component.
 const jsonValue = z.json();
 z.globalRegistry.add(jsonValue, { id: "JsonValue" });
 
