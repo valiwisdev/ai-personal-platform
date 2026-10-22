@@ -1,0 +1,37 @@
+name: Bug report (form)
+description: The report tracks a bug for investigation or repair.
+title: "fix: "
+body:
+  - type: markdown
+    attributes:
+      value: This form records a bug in the project backlog.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem
+      description: The behavior that needs investigation or repair.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: The smallest set of steps that reproduces the problem.
+      placeholder: |
+        1. The user runs ...
+        2. The user opens ...
+        3. The user observes ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or screenshots
+      description: Relevant evidence. Secrets should be removed before logs are included.
+      render: shell
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, browser, Docker version, and mise tool versions if relevant.
+      placeholder: e.g. Ubuntu 24.04, Docker 27, Node 22

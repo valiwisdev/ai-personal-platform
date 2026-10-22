@@ -1,0 +1,69 @@
+# Application tasks inherit tool versions from the root mise.toml.
+
+[tasks.setup]
+description = "Install frontend dependencies"
+dir = "{{config_root}}"
+run = [
+  'mise x -- pnpm install --frozen-lockfile',
+]
+
+[tasks.dev]
+dir = "{{config_root}}"
+run = "mise x -- pnpm dev"
+
+[tasks.lint]
+dir = "{{config_root}}"
+run = "mise x -- pnpm lint"
+
+[tasks.lint-fix]
+dir = "{{config_root}}"
+run = "mise x -- pnpm lint:fix"
+
+[tasks.format]
+dir = "{{config_root}}"
+run = "mise x -- pnpm format"
+
+[tasks.format-check]
+dir = "{{config_root}}"
+run = "mise x -- pnpm format:check"
+
+[tasks.typecheck]
+dir = "{{config_root}}"
+run = "mise x -- pnpm typecheck"
+
+[tasks.test]
+dir = "{{config_root}}"
+run = [
+  'mise run lint',
+  'mise run typecheck',
+]
+
+[tasks.build]
+dir = "{{config_root}}"
+run = "mise x -- pnpm build"
+
+[tasks.clean-cache]
+dir = "{{config_root}}"
+run = "mise x -- python -c 'from pathlib import Path; import shutil; [shutil.rmtree(p) for p in [Path(\".next\"), Path(\"node_modules/.cache\")] if p.exists()]' "
+
+[tasks.clean-deps]
+dir = "{{config_root}}"
+run = "mise x -- python -c 'from pathlib import Path; import shutil; p=Path(\"node_modules\"); shutil.rmtree(p) if p.exists() else None' "
+
+[tasks.check]
+dir = "{{config_root}}"
+run = [
+  'mise run lint',
+  'mise run format-check',
+  'mise run typecheck',
+  'mise run test',
+]
+
+[tasks.logs]
+dir = "{{config_root}}"
+run = "docker compose -f ../compose.yaml logs -f frontend"
+
+[tasks.shell]
+dir = "{{config_root}}"
+run = "docker compose -f ../compose.yaml exec frontend sh"
+

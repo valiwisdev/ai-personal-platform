@@ -1,0 +1,4 @@
+agents:
+  - id: assistant
+    name: Assistant
+    url: http://agents:8000/agent

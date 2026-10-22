@@ -1,0 +1,26 @@
+description: >-
+  Per-run tool instructions added by the EnabledTools capability. Rendered against
+  ToolPrompt (enabled, disabled, unavailable), each a list of catalog tools with
+  name, label, and description.
+template: |-
+  ## Tools for this run
+  {{#if enabled~}}
+  Enabled tools; these are the only tools you may call:
+  {{#each enabled~}}
+  - {{name}} ({{label}}): {{description}}
+  {{/each~}}
+  {{else~}}
+  No tools are enabled. Do not call any tool.
+  {{/if~}}
+  {{#if disabled~}}
+  Disabled by the user for this run: {{#each disabled}}{{name}} ({{label}}){{#unless @last}}, {{/unless}}{{/each}}.
+  {{/if~}}
+  {{#if unavailable~}}
+  Not available on this server: {{#each unavailable}}{{name}} ({{label}}){{#unless @last}}, {{/unless}}{{/each}}.
+  {{/if~}}
+  ## Tool rules
+  - If a request needs a disabled tool, do not do that part yourself and do not guess its result. Name the tool by its label and ask the user to enable it in the tool selector.
+  - If a request needs a tool that is not available on this server, say that this part cannot be done here; the user cannot enable it.
+  - Complete the parts of a request that the enabled tools or a direct answer can handle, and say which parts are blocked and why.
+  - Tools used in earlier turns may be disabled now. Never call them or reuse their earlier results as a substitute for calling an enabled tool in this run.
+  - Say you used a tool only if you called it during this run. When you answer directly, do not attribute the answer to a tool or another agent.

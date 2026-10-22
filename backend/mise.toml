@@ -1,0 +1,68 @@
+
+[tasks.setup]
+dir = "{{config_root}}"
+run = "mise x -- bun install --frozen-lockfile"
+
+[tasks.dev]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun dev"
+
+[tasks.start]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun start"
+
+[tasks.lint]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun lint"
+
+[tasks.lint-fix]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun lint:fix"
+
+[tasks.format]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun format"
+
+[tasks.format-check]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun format:check"
+
+[tasks.typecheck]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun typecheck"
+
+[tasks.db-generate]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun db:generate"
+
+[tasks.db-migrate]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun db:migrate"
+
+[tasks.db-check]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun db:check"
+
+[tasks.db-studio]
+dir = "{{config_root}}"
+run = "mise x -- bun run --bun db:studio"
+
+[tasks.check]
+dir = "{{config_root}}"
+run = ["mise run lint", "mise run format-check", "mise run typecheck", "mise run db-check"]
+
+[tasks.logs]
+dir = "{{config_root}}"
+run = "docker compose -f ../compose.yaml logs -f backend"
+
+[tasks.shell]
+dir = "{{config_root}}"
+run = "docker compose -f ../compose.yaml exec backend sh"
+
+[tasks.clean-cache]
+dir = "{{config_root}}"
+run = "rm -rf node_modules/.cache"
+
+[tasks.clean-deps]
+dir = "{{config_root}}"
+run = "rm -rf node_modules"

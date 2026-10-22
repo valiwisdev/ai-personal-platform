@@ -1,0 +1,115 @@
+name: ai-agent-platform
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-development_password}
+      POSTGRES_DB: ${POSTGRES_DB:-agents}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      PORT: "3001"
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in the root .env}
+      HEALTHCHECK_URL: ${BACKEND_HEALTHCHECK_URL:?Set BACKEND_HEALTHCHECK_URL in the root .env}
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    volumes:
+      - ./backend:/app
+      - backend_bun_modules:/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "fetch(process.env.HEALTHCHECK_URL).then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+  agents:
+    build:
+      context: ./agents
+      dockerfile: Dockerfile
+    environment:
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      AGENT_ID: ${AGENT_ID:-assistant}
+      AGENT_MODEL: ${AGENT_MODEL:-gpt-6-luna}
+      OPENCODE_API_KEY: ${OPENCODE_API_KEY:-}
+      OPENCODE_BASE_URL: ${OPENCODE_BASE_URL:?Set OPENCODE_BASE_URL in the root .env}
+      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      LOGFIRE_SERVICE_NAME: ${LOGFIRE_SERVICE_NAME:-agents}
+      LOGFIRE_ENVIRONMENT: ${LOGFIRE_ENVIRONMENT:-development}
+      LOGFIRE_INCLUDE_CONTENT: ${LOGFIRE_INCLUDE_CONTENT:-false}
+      HEALTHCHECK_URL: ${AGENTS_HEALTHCHECK_URL:?Set AGENTS_HEALTHCHECK_URL in the root .env}
+      BACKEND_URL: ${BACKEND_URL:?Set BACKEND_URL in the root .env}
+    ports:
+      - "${AGENTS_PORT:-8000}:8000"
+    volumes:
+      - ./agents:/app
+      - agents_venv:/opt/venv
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os; from urllib.request import urlopen; urlopen(os.environ['HEALTHCHECK_URL'], timeout=2)",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?Set NEXT_PUBLIC_APP_URL in the root .env}
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      agents:
+        condition: service_healthy
+    restart: unless-stopped
+    stop_grace_period: 10s
+
+volumes:
+  postgres_data:
+  frontend_node_modules:
+  agents_venv:
+  backend_bun_modules:

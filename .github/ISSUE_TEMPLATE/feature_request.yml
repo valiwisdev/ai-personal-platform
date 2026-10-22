@@ -1,0 +1,23 @@
+name: Feature request (form)
+description: The request proposes a feature or improvement for the project.
+title: "feat: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Goal
+      description: The desired outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Plan
+      description: The proposed implementation or next step.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Done when
+      description: The outcomes that define completion.
