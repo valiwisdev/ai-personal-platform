@@ -26,6 +26,12 @@ def summary_budget(text: str) -> SummaryBudget:
     return SummaryBudget(source_words=words, max_summary_words=min(words, limit))
 
 
+class Summary(BaseModel):
+    """Structured so the tool result is JSON, which AG-UI clients parse."""
+
+    summary: str
+
+
 @cache
 def summarize_instructions() -> TemplateStr[SummaryBudget]:
     return TemplateStr(load_prompt("summarize").template, deps_type=SummaryBudget)
@@ -35,7 +41,7 @@ summarize_toolset = FunctionToolset[AgentDeps]()
 
 
 @summarize_toolset.tool(metadata={"label": "Summarizer"})
-async def summarize(ctx: RunContext[AgentDeps], text: str) -> str:
+async def summarize(ctx: RunContext[AgentDeps], text: str) -> Summary:
     """Summarize the supplied text and return the summary.
 
     Args:
@@ -50,4 +56,4 @@ async def summarize(ctx: RunContext[AgentDeps], text: str) -> str:
     response = await model_request(ctx.model, [request], model_settings=agent_model_settings(ctx))
     ctx.usage.requests += 1
     ctx.usage.incr(response.usage)
-    return response.text or ""
+    return Summary(summary=response.text or "")

@@ -42,7 +42,8 @@ class FakeModel:
             self.summaries.append((prompt.content, last.instructions or "", headers))
             return ModelResponse(parts=[TextPart(f"Summary for {headers['x-opencode-session']}")])
         if isinstance(last.parts[-1], ToolReturnPart):
-            return ModelResponse(parts=[TextPart(json.dumps({"message": last.parts[-1].content}))])
+            summary = last.parts[-1].model_response_object()["summary"]
+            return ModelResponse(parts=[TextPart(json.dumps({"message": summary}))])
         return ModelResponse(parts=[ToolCallPart("summarize", {"text": SOURCE}, "summary-1")])
 
 
@@ -87,7 +88,7 @@ async def test_summary_round_trips_in_parent_history(
         for part in message.parts
         if isinstance(part, ToolReturnPart) and part.tool_name == "summarize"
     ]
-    assert [part.content for part in returns] == ["Summary for thread-1"]
+    assert [part.content for part in returns] == [{"summary": "Summary for thread-1"}]
 
 
 async def test_parent_request_limit_counts_the_summarize_request(

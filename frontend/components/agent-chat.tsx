@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import {
   CopilotChat,
@@ -43,7 +44,7 @@ export function AgentChat({ agentId, agents, threadId }: AgentChatProps) {
   function openConversation(nextAgentId: string, nextThreadId: string) {
     setSettingsOpen(false);
     router.push(
-      `/?agent=${encodeURIComponent(nextAgentId)}&thread=${encodeURIComponent(nextThreadId)}`,
+      `/agents?agent=${encodeURIComponent(nextAgentId)}&thread=${encodeURIComponent(nextThreadId)}`,
     );
   }
 
@@ -56,7 +57,7 @@ export function AgentChat({ agentId, agents, threadId }: AgentChatProps) {
     if (deleted && deletedThreadId === threadId) {
       setSettingsOpen(false);
       router.replace(
-        `/?agent=${encodeURIComponent(agentId)}&thread=${crypto.randomUUID()}`,
+        `/agents?agent=${encodeURIComponent(agentId)}&thread=${crypto.randomUUID()}`,
       );
     }
     return deleted;
@@ -122,8 +123,9 @@ function AgentConversation({
   const history = useAgentHistory(agentId, threadId);
   const toolSelection = useAgentTools(agentId, history.agent, history.isLoaded);
 
-  const status =
-    history.error || toolSelection.error ? (
+  let status: ReactNode = null;
+  if (history.error || toolSelection.error) {
+    status = (
       <div
         className="m-auto flex flex-col items-center gap-3 p-6 text-center"
         role="alert"
@@ -136,11 +138,14 @@ function AgentConversation({
           Try again
         </Button>
       </div>
-    ) : !history.isLoaded || !toolSelection.tools ? (
+    );
+  } else if (!history.isLoaded || !toolSelection.tools) {
+    status = (
       <output className="m-auto text-sm text-slate-500">
         Loading conversation…
       </output>
-    ) : null;
+    );
+  }
 
   if (status) {
     return settingsOpen ? <AgentSettings>{status}</AgentSettings> : status;

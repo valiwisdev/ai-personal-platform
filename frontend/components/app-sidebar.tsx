@@ -2,37 +2,27 @@
 
 import type { ComponentProps } from "react";
 import { usePathname } from "next/navigation";
-import {
-  Bot,
-  Code2,
-  FileText,
-  Sparkles,
-  UserRound,
-  type LucideIcon,
-} from "lucide-react";
+import { CirclePlus, Sparkles } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-type NavItem = Readonly<{ title: string; href: string; icon: LucideIcon }>;
-
-const navItems: readonly NavItem[] = [
-  { title: "Agents", href: "/", icon: Bot },
-  { title: "Coding", href: "/coding", icon: Code2 },
-  { title: "Documents", href: "/documents", icon: FileText },
-  { title: "Personal", href: "/personal", icon: UserRound },
-];
+import {
+  mainNavItems,
+  navSections,
+  newChatHref,
+  type NavItem,
+} from "@/lib/navigation";
 
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
 
   return (
@@ -51,30 +41,61 @@ export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.title}
-                  >
-                    <a
-                      href={item.href}
-                      aria-current={pathname === item.href ? "page" : undefined}
-                      onClick={() => setOpenMobile(false)}
-                    >
-                      <item.icon aria-hidden />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="New chat"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+                >
+                  <a href={newChatHref} onClick={() => setOpenMobile(false)}>
+                    <CirclePlus aria-hidden />
+                    <span>New chat</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
+            <NavMenu items={mainNavItems} />
           </SidebarGroupContent>
         </SidebarGroup>
+        {navSections.map((section) => (
+          <SidebarGroup key={section.title}>
+            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <NavMenu items={section.items} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
     </Sidebar>
+  );
+}
+
+function NavMenu({ items }: Readonly<{ items: readonly NavItem[] }>) {
+  const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+
+  return (
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.href}>
+          <SidebarMenuButton
+            asChild
+            isActive={pathname === item.href}
+            tooltip={item.title}
+          >
+            <a
+              href={item.href}
+              aria-current={pathname === item.href ? "page" : undefined}
+              onClick={() => setOpenMobile(false)}
+            >
+              <item.icon aria-hidden />
+              <span>{item.title}</span>
+            </a>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
   );
 }
