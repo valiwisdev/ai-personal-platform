@@ -39,11 +39,6 @@ export function AgentChat({ agentId, agents, threadId }: AgentChatProps) {
     isDeleting,
     deleteConversation,
   } = useConversations(agentId, agent, true);
-  const agentName =
-    agents.find((option) => option.id === agentId)?.name ?? agentId;
-  const title =
-    conversations.find((conversation) => conversation.threadId === threadId)
-      ?.title ?? agentName;
 
   function openConversation(nextAgentId: string, nextThreadId: string) {
     setSettingsOpen(false);
@@ -70,7 +65,7 @@ export function AgentChat({ agentId, agents, threadId }: AgentChatProps) {
   return (
     <AppShell>
       <SiteHeader
-        title={title}
+        title="Agentic Chat"
         agentId={agentId}
         onSettings={() => setSettingsOpen(true)}
         settingsOpen={settingsOpen}

@@ -31,12 +31,17 @@ function getStatus(
   }
 }
 
+function fortmatAgentStatus(agentId: string | undefined, isReady?: boolean) {
+  if (!agentId) return "";
+  const formatted = agentId.charAt(0).toUpperCase() + agentId.slice(1);
+  return isReady ? `${formatted} (online)`  : `${formatted} (not ready)`;
+}
+
 export function AgentStatus({ agentId }: Readonly<{ agentId: string }>) {
   const { agent, isReady } = useAgent({ agentId });
   const url = `/api/health?agent=${encodeURIComponent(agentId)}`;
   const { data, error, isLoading } = useSWR<Health>(url, fetchHealth);
   const status = getStatus(data, error, isLoading);
-  const label = isReady ? agent.agentId : "Agent";
 
   return (
     <Badge
@@ -46,9 +51,9 @@ export function AgentStatus({ agentId }: Readonly<{ agentId: string }>) {
       <span
         aria-hidden
         data-status={status}
-        className="size-1.5 rounded-full bg-slate-300 data-[status=online]:bg-slate-700"
+        className="size-1.5 rounded-full bg-slate-300 data-[status=online]:bg-green-700"
       />
-      {label} {status}
+      {fortmatAgentStatus(agent?.agentId, isReady)}
     </Badge>
   );
 }
