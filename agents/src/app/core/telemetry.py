@@ -9,7 +9,6 @@ from app.core.config import Settings
 
 
 def _request_attributes(request: Request | WebSocket, attributes: dict[str, Any]) -> dict[str, Any]:
-    # Agent input is an entire conversation; content capture belongs to the AI integration.
     return {}
 
 
