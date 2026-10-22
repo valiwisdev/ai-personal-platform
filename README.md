@@ -1,6 +1,6 @@
 # AI Personal Platform
 
-A personal AI platform with agent chat, saved conversations, attachments, and configurable tools. Built with Next.js, FastAPI/Pydantic AI, Bun/Fastify, and PostgreSQL. Coding, Documents, and Personal sections are placeholders for future features.
+A personal AI platform with agent chat, saved conversations, attachments, and configurable tools. Built with Next.js, FastAPI/Pydantic AI, Bun/Fastify, and PostgreSQL.
 
 Built using my own knowledge and AI assistance for code, design, and documentation.
 
